@@ -1,11 +1,35 @@
-stage('OWASP Dependency-Check Vulnerabilities') {
+pipeline {
+  agent any
+
+  stages {
+    stage('Checkout Code') {
       steps {
-        dependencyCheck additionalArguments: ''' 
-                    -o './'
-                    -s './'
-                    -f 'ALL' 
-                    --prettyPrint''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
-        
-        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+        checkout scm
       }
     }
+
+    stage('Run Gitleaks Scan') {
+            steps {
+                sh '''
+                    echo "Running Gitleaks scan..."
+                    gitleaks detect --source . --report-path gitleaks-report.json --exit-code 1
+                '''
+            }
+        }
+
+        stage('Post Scan Report') {
+            steps {
+                archiveArtifacts artifacts: 'gitleaks-report.json', allowEmptyArchive: true
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo "❌ Gitleaks detected secrets! Check gitleaks-report.json for details."
+        }
+        success {
+            echo "✅ No secrets found by Gitleaks."
+        }
+    }
+}
