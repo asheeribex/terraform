@@ -26,7 +26,7 @@ pipeline {
 
     post {
         failure {
-            echo "❌ Gitleaks detected secrets! Check gitleaks-report.json for details."
+            echo "❌ Gitleaks detected the secrets! Check gitleaks-report.json for details."
         }
         success {
             echo "✅ No secrets found by Gitleaks."
