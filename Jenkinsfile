@@ -12,7 +12,8 @@ pipeline {
             steps {
                 sh '''
                     echo "Running Gitleaks scan..."
-                    gitleaks detect --source . --report-path gitleaks-report.json --exit-code 1
+                    gitleaks detect --no-git --source . --report-format=json --report-path=gitleaks_report.json
+
                 '''
             }
         }
